@@ -1,6 +1,6 @@
 const url = "https://jsonplaceholder.typicode.com/posts"
 
-import { Post } from "./model"
+import { Post } from "../model"
 
 class PostService {
     async all() {

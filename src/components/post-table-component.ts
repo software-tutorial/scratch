@@ -1,6 +1,8 @@
 import {html, render} from "lit-html"
-import { postService } from "../post-service"
-import { Post } from "../model"
+import { postService } from "../service/post-service"
+
+import { Post, store } from "../model"
+import { map } from "rxjs"
 
 const rowTemplate = (post:Post) => html`
     <tr @click=${() => rowSelected(post)} ?hidden=${post.id % 3 == 0}>
@@ -35,10 +37,11 @@ class PostTableComponent extends HTMLElement {
     }
     async connectedCallback() {
         console.log("PostTable connected")
-        const posts = await postService.all()
-        console.log("post loaded", posts)
-        this.render(posts)
-        
+        store
+            .pipe(
+                map(model => model.posts)
+            )
+            .subscribe(posts => this.render(posts))
     }
     private render(posts: Post[]) {
         render(tableTemplate(posts), this.shadowRoot)

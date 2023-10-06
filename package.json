@@ -19,6 +19,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
-    "lit-html": "^2.8.0"
+    "lit-html": "^2.8.0",
+    "rxjs": "^7.8.1"
   }
 }
