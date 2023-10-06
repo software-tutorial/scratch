@@ -1,11 +1,11 @@
 import {html, render} from "lit-html"
-import { Album, Post, store } from "../model"
+import { Album, Post as Photo, store } from "../model"
 import { map } from "rxjs"
 import { Model } from "../model"
 import { produce } from "immer"
 
 interface TableLine {
-    post: Post
+    photo: Photo
     album: Album
 }
 interface ViewModel {
@@ -14,7 +14,7 @@ interface ViewModel {
 function viewModel(model: Model) {
     const lines = model.posts.map(photo => {
         const tl: TableLine = {
-            post: photo,
+            photo: photo,
             album: model.albums.get(photo.albumId)
         }
         return tl
@@ -25,15 +25,16 @@ function viewModel(model: Model) {
     return vm
 }
 
-const rowTemplate = (post:Post) => html`
-    <tr @click=${() => rowSelected(post)} ?hidden=${post.id % 3 == 0}>
-    <td>${post.id}</td>
-    <td>${post.title}</td>
+const rowTemplate = (line: TableLine) => html`
+    <tr @click=${() => rowSelected(line)} ?hidden=${line.photo.id % 3 == 0}>
+    <td>${line.photo.id}</td>
+    <td>${line.photo.title}</td>
+    <td>${line.album.title}</td>
 </tr>
 `
 
-const tableTemplate = (posts: Post[]) => {
-    const rows = posts.map(rowTemplate)
+const tableTemplate = (viewModel: ViewModel) => {
+    const rows = viewModel.lines.map(rowTemplate)
     return html`
     <style>
         body {
@@ -44,6 +45,7 @@ const tableTemplate = (posts: Post[]) => {
 <thead>
     <th>Id</th>
     <th>Title</th>
+    <th>Album</th>
 </thead>
 <tbody>
 ${rows}
@@ -60,19 +62,19 @@ class PostTableComponent extends HTMLElement {
         console.log("PostTable connected")
         store
             .pipe(
-                map(model => model.posts)
+                map(viewModel)
             )
             .subscribe(posts => this.render(posts))
     }
-    private render(posts: Post[]) {
-        render(tableTemplate(posts), this.shadowRoot)
+    private render(viewModel: ViewModel) {
+        render(tableTemplate(viewModel), this.shadowRoot)
     }
 }
-function rowSelected(post: Post) {
-    const title = post.title.toLocaleUpperCase()
+function rowSelected(line: TableLine) {
+    const title = line.photo.title.toLocaleUpperCase()
     const previousState = store.getValue()
     const nextState = produce(previousState, model => {
-        const index = model.posts.findIndex(p => p.id == post.id)
+        const index = model.posts.findIndex(p => p.id == line.photo.id)
         model.posts[index].title = title // TODO: find correct index!!!
     })
     store.next(nextState)
