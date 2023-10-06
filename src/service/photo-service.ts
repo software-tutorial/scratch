@@ -1,4 +1,4 @@
-const url = "https://jsonplaceholder.typicode.com/posts"
+const url = "https://jsonplaceholder.typicode.com/photos"
 
 import { Post } from "../model"
 
@@ -9,6 +9,6 @@ class PostService {
     }
 }
 
-const postService = new PostService()
+const photoService = new PostService()
 
-export { postService }
+export { photoService }

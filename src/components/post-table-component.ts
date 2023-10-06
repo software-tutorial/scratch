@@ -1,8 +1,29 @@
 import {html, render} from "lit-html"
-import { postService } from "../service/post-service"
-
-import { Post, store } from "../model"
+import { Album, Post, store } from "../model"
 import { map } from "rxjs"
+import { Model } from "../model"
+import { produce } from "immer"
+
+interface TableLine {
+    post: Post
+    album: Album
+}
+interface ViewModel {
+    lines: TableLine[]
+}
+function viewModel(model: Model) {
+    const lines = model.posts.map(photo => {
+        const tl: TableLine = {
+            post: photo,
+            album: model.albums.get(photo.albumId)
+        }
+        return tl
+    })
+    const vm: ViewModel = {
+        lines
+    }
+    return vm
+}
 
 const rowTemplate = (post:Post) => html`
     <tr @click=${() => rowSelected(post)} ?hidden=${post.id % 3 == 0}>
@@ -48,7 +69,13 @@ class PostTableComponent extends HTMLElement {
     }
 }
 function rowSelected(post: Post) {
-    alert(`post selected ${post.title}`)
+    const title = post.title.toLocaleUpperCase()
+    const previousState = store.getValue()
+    const nextState = produce(previousState, model => {
+        const index = model.posts.findIndex(p => p.id == post.id)
+        model.posts[index].title = title // TODO: find correct index!!!
+    })
+    store.next(nextState)
 }
 
 customElements.define("post-table", PostTableComponent)

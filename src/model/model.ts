@@ -1,17 +1,18 @@
-import { postService } from "../service/post-service"
 import { Album } from "./album"
-import { Post } from "./post"
+import { Photo } from "./photo"
 import { BehaviorSubject } from "rxjs"
 
+export type AlbumId = number
+export type AlbumMap = Map<AlbumId, Album>
+
 export interface Model {
-    albums: Album[],
-    posts: Post[]
+    readonly albums: AlbumMap,
+    readonly posts: Photo[]
 }
 const initialState: Model = {
-    albums: [],
+    albums: new Map(),
     posts: []
 }
-
 
 const store = new BehaviorSubject(initialState)
 

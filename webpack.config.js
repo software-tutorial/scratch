@@ -28,7 +28,7 @@ module.exports = {
         port: 4200
     },
     plugins: [new HtmlWebpackPlugin({
-        title: "Hello World",
+        title: "Albums",
         hash: true
     })]
 }

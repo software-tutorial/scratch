@@ -1,19 +1,21 @@
-import { postService } from "../service/post-service"
-import { Model, store } from "./model"
+import { photoService } from "../service/photo-service"
+import { service as albumService} from "../service/album-service"
+import { AlbumId, Model, store } from "./model"
+import { Album } from "./album"
 
-export { Post } from "./post"
+export { Photo as Post } from "./photo"
 export { Album } from "./album"
-export { store }
+export { store, Model }
 
-console.log("index.ts")
 async function initialize() {
-    console.log("initialize")
-    const posts = await postService.all()
+    const posts = await photoService.all()
+    const loadedAlbums = await albumService.all()
+    let albums = new Map<AlbumId, Album>()
+    loadedAlbums.forEach(album => albums.set(album.id, album))
     const state: Model = {
-        albums: [],
+        albums,
         posts
     }
-    console.log("posts loaded", posts)
     store.next(state)
 }
 
